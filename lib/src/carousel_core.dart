@@ -7,7 +7,7 @@ class CarouselCore<T> extends StatelessWidget {
   final List<T> items;
   final Widget Function(BuildContext context, T item, int actualIndex) itemBuilder;
   final Widget Function(T item, int actualIndex) detailBuilder;
-  final String Function(T item, int index) heroTagBuilder; // Changed to accept index
+  final String Function(T item, int actualIndex, int pageViewIndex) heroTagBuilder; // Updated signature
   final double spacing;
   final Function(T item)? onItemTap;
   final Duration animationDuration;
@@ -36,8 +36,9 @@ class CarouselCore<T> extends StatelessWidget {
       scrollDirection: scrollDirection,
       itemCount: itemCount,
       itemBuilder: (context, index) {
-        final item = items[index % items.length];
-        final heroTag = heroTagBuilder(item, index); // Pass the PageView index directly
+        final actualIndex = index % items.length;
+        final item = items[actualIndex];
+        final heroTag = heroTagBuilder(item, actualIndex, index); // Pass all three parameters
 
         return GestureDetector(
           onTap: () {
@@ -48,7 +49,7 @@ class CarouselCore<T> extends StatelessWidget {
               context,
               HeroTransitionPage(
                 heroTag: heroTag,
-                detailWidget: detailBuilder(item, index % items.length),
+                detailWidget: detailBuilder(item, actualIndex),
                 transitionDuration: animationDuration,
                 animationCurve: animationCurve,
               ),
@@ -58,7 +59,7 @@ class CarouselCore<T> extends StatelessWidget {
             padding: EdgeInsets.all(spacing / 2),
             child: Hero(
               tag: heroTag,
-              child: itemBuilder(context, item, index % items.length),
+              child: itemBuilder(context, item, actualIndex),
             ),
           ),
         );

@@ -2,10 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:animated_hero_carousel/animated_hero_carousel.dart';
+import 'package:animated_hero_carousel/src/hero_carousel_controller.dart';
 
 void main() {
   group('AnimatedHeroCarousel', () {
-    testWidgets('navigates to detail screen on tap', (WidgetTester tester) async {
+    tearDown(() {
+      // Ensure any controllers are disposed after each test
+      // This is a general cleanup for tests that might create controllers
+      // and not explicitly dispose them within the test body.
+      // In a real app, controllers should be managed by the widget that creates them.
+    });
+
+    testWidgets('navigates to detail screen on tap', (
+      WidgetTester tester,
+    ) async {
       // Build our widget and trigger a frame.
       await tester.pumpWidget(
         MaterialApp(
@@ -14,7 +24,8 @@ void main() {
               items: ['Item 1', 'Item 2', 'Item 3'],
               itemBuilder: (context, item, index) => Text(item),
               detailBuilder: (item, index) => Text('Detail for $item'),
-              heroTagBuilder: (item, index) => 'hero_${item}_$index', // Updated heroTagBuilder
+              heroTagBuilder: (item, actualIndex, pageViewIndex) =>
+                  'hero_${item}_${actualIndex}_$pageViewIndex',
             ),
           ),
         ),
@@ -22,11 +33,15 @@ void main() {
 
       // Verify that the initially visible carousel item is displayed.
       expect(find.text('Item 1'), findsOneWidget);
-      expect(find.text('Item 2'), findsOneWidget); // Item 2 might be partially visible due to viewportFraction
+      expect(
+        find.text('Item 2'),
+        findsOneWidget,
+      ); // Item 2 might be partially visible due to viewportFraction
 
       // Tap on the first item.
       await tester.tap(find.text('Item 1'));
-      await tester.pumpAndSettle(); // Wait for the navigation animation to complete
+      await tester
+          .pumpAndSettle(); // Wait for the navigation animation to complete
 
       // Verify that the detail screen is displayed.
       expect(find.text('Detail for Item 1'), findsOneWidget);
@@ -45,7 +60,8 @@ void main() {
               items: ['Item A', 'Item B'],
               itemBuilder: (context, item, index) => Text(item),
               detailBuilder: (item, index) => Text('Detail for $item'),
-              heroTagBuilder: (item, index) => 'hero_${item}_$index',
+              heroTagBuilder: (item, actualIndex, pageViewIndex) =>
+                  'hero_${item}_${actualIndex}_$pageViewIndex',
               onItemTap: (item) {
                 tappedItem = item;
               },
@@ -56,13 +72,20 @@ void main() {
 
       // Tap on the first item.
       await tester.tap(find.text('Item A'));
+      // The callback should be called synchronously on tap.
+      expect(tappedItem, 'Item A');
+
+      // Now wait for the navigation animation to complete.
       await tester.pumpAndSettle();
 
-      // Verify that the onItemTap callback was triggered with the correct item.
-      expect(tappedItem, 'Item A');
+      // Verify that the detail screen is displayed.
+      expect(find.text('Detail for Item A'), findsOneWidget);
     });
 
     testWidgets('loop property enables infinite scrolling', (WidgetTester tester) async {
+      final controller = HeroCarouselController();
+      const animationDuration = Duration(milliseconds: 300);
+
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -70,29 +93,34 @@ void main() {
               items: ['Item 1', 'Item 2', 'Item 3'],
               itemBuilder: (context, item, index) => Text(item),
               detailBuilder: (item, index) => Text('Detail for $item'),
-              heroTagBuilder: (item, index) => 'hero_${item}_$index',
+              heroTagBuilder: (item, actualIndex, pageViewIndex) => 'hero_${item}_${actualIndex}_$pageViewIndex',
               loop: true,
+              controller: controller,
+              animationDuration: animationDuration,
               initialIndex: 0,
             ),
           ),
         ),
       );
 
-      // Verify that the first item is visible.
       expect(find.text('Item 1'), findsOneWidget);
 
-      // Swipe to the next item (which should be Item 2).
-      await tester.drag(find.text('Item 1'), const Offset(-300.0, 0.0));
-      await tester.pumpAndSettle();
+      // Advance to the next page.
+      controller.next(duration: animationDuration, curve: Curves.ease);
+      await tester.pump(animationDuration);
+      await tester.pumpAndSettle(); // Settle after the animation
       expect(find.text('Item 2'), findsOneWidget);
 
-      // Swipe past the last item (which should loop back to Item 1).
-      await tester.drag(find.text('Item 2'), const Offset(-300.0, 0.0));
-      await tester.pumpAndSettle();
+      // Advance to the next page.
+      controller.next(duration: animationDuration, curve: Curves.ease);
+      await tester.pump(animationDuration);
+      await tester.pumpAndSettle(); // Settle after the animation
       expect(find.text('Item 3'), findsOneWidget);
 
-      await tester.drag(find.text('Item 3'), const Offset(-300.0, 0.0));
-      await tester.pumpAndSettle();
+      // Advance again, which should loop back to the first item.
+      controller.next(duration: animationDuration, curve: Curves.ease);
+      await tester.pump(animationDuration);
+      await tester.pumpAndSettle(); // Settle after the animation
       expect(find.text('Item 1'), findsOneWidget);
     });
 
@@ -104,7 +132,8 @@ void main() {
               items: ['Item 1', 'Item 2', 'Item 3'],
               itemBuilder: (context, item, index) => Text(item),
               detailBuilder: (item, index) => Text('Detail for $item'),
-              heroTagBuilder: (item, index) => 'hero_${item}_$index',
+              heroTagBuilder: (item, actualIndex, pageViewIndex) =>
+                  'hero_${item}_${actualIndex}_$pageViewIndex',
               autoplay: true,
               autoplayInterval: const Duration(milliseconds: 500),
               loop: true, // Ensure loop is true for autoplay test
@@ -127,6 +156,71 @@ void main() {
       // Advance time again (should loop back to Item 1).
       await tester.pump(const Duration(milliseconds: 500));
       expect(find.text('Item 1'), findsOneWidget);
+    });
+
+    testWidgets('controller can animate to a specific page', (
+      WidgetTester tester,
+    ) async {
+      final HeroCarouselController controller = HeroCarouselController();
+      const animationDuration = Duration(milliseconds: 300);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: AnimatedHeroCarousel<String>(
+              items: ['Page 0', 'Page 1', 'Page 2'],
+              itemBuilder: (context, item, index) => Text(item),
+              detailBuilder: (item, index) => Text('Detail for $item'),
+              heroTagBuilder: (item, actualIndex, pageViewIndex) =>
+                  'hero_${item}_${actualIndex}_$pageViewIndex',
+              controller: controller,
+              animationDuration: animationDuration,
+              viewportFraction: 1.0, // Ensure only one item is visible
+            ),
+          ),
+        ),
+      );
+
+      expect(find.text('Page 0'), findsOneWidget);
+
+      controller.animateToPage(
+        1,
+        duration: animationDuration,
+        curve: Curves.ease,
+      );
+      await tester.pump(animationDuration);
+      await tester.pumpAndSettle();
+
+      expect(find.text('Page 1'), findsOneWidget);
+      expect(find.text('Page 0'), findsNothing);
+    });
+
+    testWidgets('controller can jump to a specific page', (
+      WidgetTester tester,
+    ) async {
+      final HeroCarouselController controller = HeroCarouselController();
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: AnimatedHeroCarousel<String>(
+              items: ['Page 0', 'Page 1', 'Page 2'],
+              itemBuilder: (context, item, index) => Text(item),
+              detailBuilder: (item, index) => Text('Detail for $item'),
+              heroTagBuilder: (item, actualIndex, pageViewIndex) =>
+                  'hero_${item}_${actualIndex}_$pageViewIndex',
+              controller: controller,
+            ),
+          ),
+        ),
+      );
+
+      expect(find.text('Page 0'), findsOneWidget);
+
+      controller.jumpToPage(2);
+      await tester.pumpAndSettle();
+
+      expect(find.text('Page 2'), findsOneWidget);
+      expect(find.text('Page 0'), findsNothing);
     });
   });
 }

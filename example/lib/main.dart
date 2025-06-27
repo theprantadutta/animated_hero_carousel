@@ -57,7 +57,7 @@ class MyApp extends StatelessWidget {
                 return ClipRRect(
                   borderRadius: BorderRadius.circular(12),
                   child: Hero(
-                    tag: 'movie_${movie.title}',
+                    tag: 'movie_${movie.title}_$index', // Updated heroTagBuilder
                     child: Image.network(
                       movie.imageUrl,
                       fit: BoxFit.cover,
@@ -65,7 +65,7 @@ class MyApp extends StatelessWidget {
                   ),
                 );
               },
-              heroTagBuilder: (movie, index) => 'movie_${movie.title}',
+              heroTagBuilder: (movie, actualIndex, pageViewIndex) => 'movie_${movie.title}_${actualIndex}_$pageViewIndex', // Updated heroTagBuilder
               detailBuilder: (movie, index) {
                 return Scaffold(
                   appBar: AppBar(
@@ -76,7 +76,7 @@ class MyApp extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Hero(
-                          tag: 'movie_${movie.title}',
+                          tag: 'movie_${movie.title}_$index', // Updated heroTagBuilder
                           child: Image.network(movie.imageUrl),
                         ),
                         Padding(

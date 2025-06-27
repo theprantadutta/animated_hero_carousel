@@ -3,13 +3,14 @@ library animated_hero_carousel;
 import 'package:flutter/material.dart';
 import 'package:animated_hero_carousel/src/indicators.dart';
 import 'package:animated_hero_carousel/src/carousel_core.dart';
+import 'package:animated_hero_carousel/src/hero_carousel_controller.dart';
 import 'dart:async';
 
 class AnimatedHeroCarousel<T> extends StatefulWidget {
   final List<T> items;
   final Widget Function(BuildContext context, T item, int index) itemBuilder;
   final Widget Function(T item, int index) detailBuilder;
-  final String Function(T item, int index) heroTagBuilder;
+  final String Function(T item, int actualIndex, int pageViewIndex) heroTagBuilder;
   final Axis scrollDirection;
   final int initialIndex;
   final double spacing;
@@ -21,6 +22,7 @@ class AnimatedHeroCarousel<T> extends StatefulWidget {
   final bool loop;
   final bool autoplay;
   final Duration autoplayInterval;
+  final HeroCarouselController? controller;
 
   const AnimatedHeroCarousel({
     Key? key,
@@ -39,6 +41,7 @@ class AnimatedHeroCarousel<T> extends StatefulWidget {
     this.loop = false,
     this.autoplay = false,
     this.autoplayInterval = const Duration(seconds: 3),
+    this.controller,
   }) : super(key: key);
 
   @override
@@ -54,7 +57,7 @@ class _AnimatedHeroCarouselState<T> extends State<AnimatedHeroCarousel<T>> {
   void initState() {
     super.initState();
     _pageController = PageController(
-      initialPage: widget.loop ? (widget.items.length * 1000000) + widget.initialIndex : widget.initialIndex,
+      initialPage: widget.loop ? (widget.items.length * 1000) + widget.initialIndex : widget.initialIndex, // Changed 1000000 to 1000
       viewportFraction: widget.viewportFraction,
     );
     _currentIndexNotifier = ValueNotifier<int>(widget.initialIndex);
@@ -67,6 +70,8 @@ class _AnimatedHeroCarouselState<T> extends State<AnimatedHeroCarousel<T>> {
     if (widget.autoplay) {
       _startAutoplay();
     }
+
+    widget.controller?.attach(_pageController);
   }
 
   void _startAutoplay() {
@@ -90,6 +95,7 @@ class _AnimatedHeroCarouselState<T> extends State<AnimatedHeroCarousel<T>> {
   @override
   void dispose() {
     _stopAutoplay();
+    widget.controller?.detach();
     _pageController.dispose();
     _currentIndexNotifier.dispose();
     super.dispose();
@@ -107,7 +113,7 @@ class _AnimatedHeroCarouselState<T> extends State<AnimatedHeroCarousel<T>> {
             items: widget.items,
             itemBuilder: widget.itemBuilder,
             detailBuilder: widget.detailBuilder,
-            heroTagBuilder: (item, index) => widget.heroTagBuilder(item, index), // Pass index to heroTagBuilder
+            heroTagBuilder: (item, index, pageViewIndex) => widget.heroTagBuilder(item, index, pageViewIndex),
             spacing: widget.spacing,
             onItemTap: widget.onItemTap,
             animationDuration: widget.animationDuration,
