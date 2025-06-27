@@ -14,7 +14,7 @@ void main() {
               items: ['Item 1', 'Item 2', 'Item 3'],
               itemBuilder: (context, item, index) => Text(item),
               detailBuilder: (item, index) => Text('Detail for $item'),
-              heroTagBuilder: (item, index) => 'hero_$index',
+              heroTagBuilder: (item, index) => 'hero_${item}_$index', // Updated heroTagBuilder
             ),
           ),
         ),
@@ -45,7 +45,7 @@ void main() {
               items: ['Item A', 'Item B'],
               itemBuilder: (context, item, index) => Text(item),
               detailBuilder: (item, index) => Text('Detail for $item'),
-              heroTagBuilder: (item, index) => 'hero_$index',
+              heroTagBuilder: (item, index) => 'hero_${item}_$index',
               onItemTap: (item) {
                 tappedItem = item;
               },
@@ -70,7 +70,7 @@ void main() {
               items: ['Item 1', 'Item 2', 'Item 3'],
               itemBuilder: (context, item, index) => Text(item),
               detailBuilder: (item, index) => Text('Detail for $item'),
-              heroTagBuilder: (item, index) => 'hero_$index',
+              heroTagBuilder: (item, index) => 'hero_${item}_$index',
               loop: true,
               initialIndex: 0,
             ),
@@ -93,6 +93,39 @@ void main() {
 
       await tester.drag(find.text('Item 3'), const Offset(-300.0, 0.0));
       await tester.pumpAndSettle();
+      expect(find.text('Item 1'), findsOneWidget);
+    });
+
+    testWidgets('autoplay advances carousel', (WidgetTester tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: AnimatedHeroCarousel<String>(
+              items: ['Item 1', 'Item 2', 'Item 3'],
+              itemBuilder: (context, item, index) => Text(item),
+              detailBuilder: (item, index) => Text('Detail for $item'),
+              heroTagBuilder: (item, index) => 'hero_${item}_$index',
+              autoplay: true,
+              autoplayInterval: const Duration(milliseconds: 500),
+              loop: true, // Ensure loop is true for autoplay test
+            ),
+          ),
+        ),
+      );
+
+      // Initially, Item 1 should be visible.
+      expect(find.text('Item 1'), findsOneWidget);
+
+      // Advance time by more than the autoplay interval.
+      await tester.pump(const Duration(milliseconds: 550));
+      expect(find.text('Item 2'), findsOneWidget);
+
+      // Advance time again.
+      await tester.pump(const Duration(milliseconds: 500));
+      expect(find.text('Item 3'), findsOneWidget);
+
+      // Advance time again (should loop back to Item 1).
+      await tester.pump(const Duration(milliseconds: 500));
       expect(find.text('Item 1'), findsOneWidget);
     });
   });

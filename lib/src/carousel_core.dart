@@ -5,9 +5,9 @@ class CarouselCore<T> extends StatelessWidget {
   final PageController pageController;
   final Axis scrollDirection;
   final List<T> items;
-  final Widget Function(BuildContext context, T item, int actualIndex) itemBuilder; // Changed index to actualIndex
-  final Widget Function(T item, int actualIndex) detailBuilder; // Changed index to actualIndex
-  final String Function(T item, int actualIndex) heroTagBuilder; // Changed index to actualIndex
+  final Widget Function(BuildContext context, T item, int actualIndex) itemBuilder;
+  final Widget Function(T item, int actualIndex) detailBuilder;
+  final String Function(T item, int index) heroTagBuilder; // Changed to accept index
   final double spacing;
   final Function(T item)? onItemTap;
   final Duration animationDuration;
@@ -36,8 +36,8 @@ class CarouselCore<T> extends StatelessWidget {
       scrollDirection: scrollDirection,
       itemCount: itemCount,
       itemBuilder: (context, index) {
-        final item = items[index % items.length]; // Use modulo to get actual index
-        final heroTag = heroTagBuilder(item, index % items.length); // Use modulo to get actual index
+        final item = items[index % items.length];
+        final heroTag = heroTagBuilder(item, index); // Pass the PageView index directly
 
         return GestureDetector(
           onTap: () {
@@ -48,7 +48,7 @@ class CarouselCore<T> extends StatelessWidget {
               context,
               HeroTransitionPage(
                 heroTag: heroTag,
-                detailWidget: detailBuilder(item, index % items.length), // Use modulo to get actual index
+                detailWidget: detailBuilder(item, index % items.length),
                 transitionDuration: animationDuration,
                 animationCurve: animationCurve,
               ),
@@ -58,7 +58,7 @@ class CarouselCore<T> extends StatelessWidget {
             padding: EdgeInsets.all(spacing / 2),
             child: Hero(
               tag: heroTag,
-              child: itemBuilder(context, item, index % items.length), // Use modulo to get actual index
+              child: itemBuilder(context, item, index % items.length),
             ),
           ),
         );

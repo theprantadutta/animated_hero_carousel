@@ -1,1 +1,1 @@
-feat: implement infinite loop functionality
+feat: implement loop and autoplay features, fix hero tag issue
