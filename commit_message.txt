@@ -1,1 +1,1 @@
-refactor: extract HeroTransitionPage and CarouselCore
+feat: create example application
