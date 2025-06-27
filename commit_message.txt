@@ -1,1 +1,1 @@
-feat: initial commit
+feat: implement showIndicators and onItemTap features

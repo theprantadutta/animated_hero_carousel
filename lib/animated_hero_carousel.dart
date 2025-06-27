@@ -1,6 +1,7 @@
 library animated_hero_carousel;
 
 import 'package:flutter/material.dart';
+import 'package:animated_hero_carousel/src/indicators.dart';
 
 class AnimatedHeroCarousel<T> extends StatefulWidget {
   final List<T> items;
@@ -38,6 +39,7 @@ class AnimatedHeroCarousel<T> extends StatefulWidget {
 
 class _AnimatedHeroCarouselState<T> extends State<AnimatedHeroCarousel<T>> {
   late PageController _pageController;
+  late ValueNotifier<int> _currentIndexNotifier;
 
   @override
   void initState() {
@@ -46,54 +48,80 @@ class _AnimatedHeroCarouselState<T> extends State<AnimatedHeroCarousel<T>> {
       initialPage: widget.initialIndex,
       viewportFraction: widget.viewportFraction,
     );
+    _currentIndexNotifier = ValueNotifier<int>(widget.initialIndex);
+
+    _pageController.addListener(() {
+      _currentIndexNotifier.value = _pageController.page?.round() ?? 0;
+    });
   }
 
   @override
   void dispose() {
     _pageController.dispose();
+    _currentIndexNotifier.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return PageView.builder(
-      controller: _pageController,
-      scrollDirection: widget.scrollDirection,
-      itemCount: widget.items.length,
-      itemBuilder: (context, index) {
-        final item = widget.items[index];
-        final heroTag = widget.heroTagBuilder(item, index);
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Expanded(
+          child: PageView.builder(
+            controller: _pageController,
+            scrollDirection: widget.scrollDirection,
+            itemCount: widget.items.length,
+            itemBuilder: (context, index) {
+              final item = widget.items[index];
+              final heroTag = widget.heroTagBuilder(item, index);
 
-        return GestureDetector(
-          onTap: () {
-            if (widget.onItemTap != null) {
-              widget.onItemTap!(item);
-            }
-            Navigator.push(
-              context,
-              PageRouteBuilder(
-                transitionDuration: widget.animationDuration,
-                pageBuilder: (context, animation, secondaryAnimation) {
-                  return FadeTransition(
-                    opacity: animation,
-                    child: Hero(
-                      tag: heroTag,
-                      child: widget.detailBuilder(item, index),
+              return GestureDetector(
+                onTap: () {
+                  if (widget.onItemTap != null) {
+                    widget.onItemTap!(item);
+                  }
+                  Navigator.push(
+                    context,
+                    PageRouteBuilder(
+                      transitionDuration: widget.animationDuration,
+                      pageBuilder: (context, animation, secondaryAnimation) {
+                        return FadeTransition(
+                          opacity: animation,
+                          child: Hero(
+                            tag: heroTag,
+                            child: widget.detailBuilder(item, index),
+                          ),
+                        );
+                      },
                     ),
                   );
                 },
-              ),
-            );
-          },
-          child: Padding(
-            padding: EdgeInsets.all(widget.spacing / 2),
-            child: Hero(
-              tag: heroTag,
-              child: widget.itemBuilder(context, item, index),
+                child: Padding(
+                  padding: EdgeInsets.all(widget.spacing / 2),
+                  child: Hero(
+                    tag: heroTag,
+                    child: widget.itemBuilder(context, item, index),
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+        if (widget.showIndicators)
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: ValueListenableBuilder<int>(
+              valueListenable: _currentIndexNotifier,
+              builder: (context, currentIndex, child) {
+                return CarouselIndicators(
+                  itemCount: widget.items.length,
+                  currentIndex: currentIndex,
+                );
+              },
             ),
           ),
-        );
-      },
+      ],
     );
   }
 }
