@@ -2,6 +2,7 @@ library animated_hero_carousel;
 
 import 'package:flutter/material.dart';
 import 'package:animated_hero_carousel/src/indicators.dart';
+import 'package:animated_hero_carousel/src/carousel_core.dart';
 
 class AnimatedHeroCarousel<T> extends StatefulWidget {
   final List<T> items;
@@ -68,44 +69,17 @@ class _AnimatedHeroCarouselState<T> extends State<AnimatedHeroCarousel<T>> {
       mainAxisSize: MainAxisSize.min,
       children: [
         Expanded(
-          child: PageView.builder(
-            controller: _pageController,
+          child: CarouselCore<T>(
+            pageController: _pageController,
             scrollDirection: widget.scrollDirection,
-            itemCount: widget.items.length,
-            itemBuilder: (context, index) {
-              final item = widget.items[index];
-              final heroTag = widget.heroTagBuilder(item, index);
-
-              return GestureDetector(
-                onTap: () {
-                  if (widget.onItemTap != null) {
-                    widget.onItemTap!(item);
-                  }
-                  Navigator.push(
-                    context,
-                    PageRouteBuilder(
-                      transitionDuration: widget.animationDuration,
-                      pageBuilder: (context, animation, secondaryAnimation) {
-                        return FadeTransition(
-                          opacity: animation,
-                          child: Hero(
-                            tag: heroTag,
-                            child: widget.detailBuilder(item, index),
-                          ),
-                        );
-                      },
-                    ),
-                  );
-                },
-                child: Padding(
-                  padding: EdgeInsets.all(widget.spacing / 2),
-                  child: Hero(
-                    tag: heroTag,
-                    child: widget.itemBuilder(context, item, index),
-                  ),
-                ),
-              );
-            },
+            items: widget.items, // Pass items to CarouselCore
+            itemBuilder: widget.itemBuilder,
+            detailBuilder: widget.detailBuilder,
+            heroTagBuilder: widget.heroTagBuilder,
+            spacing: widget.spacing,
+            onItemTap: widget.onItemTap,
+            animationDuration: widget.animationDuration,
+            animationCurve: widget.animationCurve,
           ),
         ),
         if (widget.showIndicators)
