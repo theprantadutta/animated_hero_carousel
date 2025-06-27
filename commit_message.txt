@@ -1,1 +1,1 @@
-feat: create example application
+feat: implement infinite loop functionality

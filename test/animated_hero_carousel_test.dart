@@ -61,5 +61,39 @@ void main() {
       // Verify that the onItemTap callback was triggered with the correct item.
       expect(tappedItem, 'Item A');
     });
+
+    testWidgets('loop property enables infinite scrolling', (WidgetTester tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: AnimatedHeroCarousel<String>(
+              items: ['Item 1', 'Item 2', 'Item 3'],
+              itemBuilder: (context, item, index) => Text(item),
+              detailBuilder: (item, index) => Text('Detail for $item'),
+              heroTagBuilder: (item, index) => 'hero_$index',
+              loop: true,
+              initialIndex: 0,
+            ),
+          ),
+        ),
+      );
+
+      // Verify that the first item is visible.
+      expect(find.text('Item 1'), findsOneWidget);
+
+      // Swipe to the next item (which should be Item 2).
+      await tester.drag(find.text('Item 1'), const Offset(-300.0, 0.0));
+      await tester.pumpAndSettle();
+      expect(find.text('Item 2'), findsOneWidget);
+
+      // Swipe past the last item (which should loop back to Item 1).
+      await tester.drag(find.text('Item 2'), const Offset(-300.0, 0.0));
+      await tester.pumpAndSettle();
+      expect(find.text('Item 3'), findsOneWidget);
+
+      await tester.drag(find.text('Item 3'), const Offset(-300.0, 0.0));
+      await tester.pumpAndSettle();
+      expect(find.text('Item 1'), findsOneWidget);
+    });
   });
 }

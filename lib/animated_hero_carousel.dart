@@ -17,6 +17,7 @@ class AnimatedHeroCarousel<T> extends StatefulWidget {
   final double viewportFraction;
   final Duration animationDuration;
   final Curve animationCurve;
+  final bool loop; // New property for infinite loop
 
   const AnimatedHeroCarousel({
     Key? key,
@@ -32,6 +33,7 @@ class AnimatedHeroCarousel<T> extends StatefulWidget {
     this.viewportFraction = 0.8,
     this.animationDuration = const Duration(milliseconds: 300),
     this.animationCurve = Curves.ease,
+    this.loop = false, // Default to false
   }) : super(key: key);
 
   @override
@@ -46,13 +48,14 @@ class _AnimatedHeroCarouselState<T> extends State<AnimatedHeroCarousel<T>> {
   void initState() {
     super.initState();
     _pageController = PageController(
-      initialPage: widget.initialIndex,
+      initialPage: widget.loop ? (widget.items.length * 1000000) + widget.initialIndex : widget.initialIndex,
       viewportFraction: widget.viewportFraction,
     );
     _currentIndexNotifier = ValueNotifier<int>(widget.initialIndex);
 
     _pageController.addListener(() {
-      _currentIndexNotifier.value = _pageController.page?.round() ?? 0;
+      int currentPage = _pageController.page?.round() ?? 0;
+      _currentIndexNotifier.value = currentPage % widget.items.length;
     });
   }
 
@@ -73,13 +76,23 @@ class _AnimatedHeroCarouselState<T> extends State<AnimatedHeroCarousel<T>> {
             pageController: _pageController,
             scrollDirection: widget.scrollDirection,
             items: widget.items, // Pass items to CarouselCore
-            itemBuilder: widget.itemBuilder,
-            detailBuilder: widget.detailBuilder,
-            heroTagBuilder: widget.heroTagBuilder,
+            itemBuilder: (context, item, index) {
+              final actualIndex = widget.loop ? index % widget.items.length : index;
+              return widget.itemBuilder(context, widget.items[actualIndex], actualIndex);
+            },
+            detailBuilder: (item, index) {
+              final actualIndex = widget.loop ? index % widget.items.length : index;
+              return widget.detailBuilder(widget.items[actualIndex], actualIndex);
+            },
+            heroTagBuilder: (item, index) {
+              final actualIndex = widget.loop ? index % widget.items.length : index;
+              return widget.heroTagBuilder(widget.items[actualIndex], actualIndex);
+            },
             spacing: widget.spacing,
             onItemTap: widget.onItemTap,
             animationDuration: widget.animationDuration,
             animationCurve: widget.animationCurve,
+            itemCount: widget.loop ? null : widget.items.length, // Set itemCount to null for infinite loop
           ),
         ),
         if (widget.showIndicators)
