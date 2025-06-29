@@ -6,7 +6,8 @@ class CarouselCore<T> extends StatelessWidget {
   final PageController pageController;
   final Axis scrollDirection;
   final List<T> items;
-  final Widget Function(BuildContext context, T item, int actualIndex) itemBuilder;
+  final Widget Function(
+      BuildContext context, T item, int actualIndex, PageController pageController) itemBuilder;
   final Widget Function(T item, int actualIndex) detailBuilder;
   final String Function(T item, int actualIndex, int pageViewIndex) heroTagBuilder; // Updated signature
   final double spacing;
@@ -51,45 +52,34 @@ class CarouselCore<T> extends StatelessWidget {
         final item = items[actualIndex];
         final heroTag = heroTagBuilder(item, actualIndex, index); // Pass all three parameters
 
-        return AnimatedBuilder(
-          animation: pageController,
-          builder: (context, child) {
-            double offset = 0.0;
-            if (pageController.hasClients && pageController.position.hasContentDimensions) {
-              offset = (index - (pageController.page ?? index)) * (parallaxFactor ?? 0.0);
-            }
-            return Transform.translate(
-              offset: Offset(scrollDirection == Axis.horizontal ? offset : 0.0, scrollDirection == Axis.vertical ? offset : 0.0),
-              child: GestureDetector(
-                onTap: () {
-                  if (onItemTap != null) {
-                    onItemTap!(item);
-                  }
-                  Navigator.push(
-                    context,
-                    HeroTransitionPage(
-                      heroTag: heroTag,
-                      detailWidget: detailBuilder(item, actualIndex),
-                      transitionDuration: animationDuration ?? const Duration(milliseconds: 300),
-                      animationCurve: animationCurve ?? Curves.ease,
-                      enableDragToExpand: enableDragToExpand,
-                      expandedHeight: expandedHeight,
-                      collapsedHeight: collapsedHeight,
-                      dragHandleBuilder: dragHandleBuilder,
-                    ),
-                  );
-                },
-                child: Padding(
-                  padding: EdgeInsets.all(spacing / 2),
-                  child: Hero(
-                    tag: heroTag,
-                    child: itemBuilder(context, item, actualIndex),
-                  ),
-                ),
-              ),
-            );
-          },
-        );
+        return GestureDetector(
+  onTap: () {
+    if (onItemTap != null) {
+      onItemTap!(item);
+    }
+    Navigator.push(
+      context,
+      HeroTransitionPage(
+        heroTag: heroTag,
+        detailWidget: detailBuilder(item, actualIndex),
+        transitionDuration:
+            animationDuration ?? const Duration(milliseconds: 300),
+        animationCurve: animationCurve ?? Curves.ease,
+        enableDragToExpand: enableDragToExpand,
+        expandedHeight: expandedHeight,
+        collapsedHeight: collapsedHeight,
+        dragHandleBuilder: dragHandleBuilder,
+      ),
+    );
+  },
+  child: Padding(
+    padding: EdgeInsets.all(spacing / 2),
+    child: Hero(
+      tag: heroTag,
+      child: itemBuilder(context, item, actualIndex, pageController),
+    ),
+  ),
+);
       },
     );
   }

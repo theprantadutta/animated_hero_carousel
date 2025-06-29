@@ -1,5 +1,8 @@
 library animated_hero_carousel;
 
+export 'src/carousel_style.dart';
+export 'src/indicators.dart';
+
 import 'package:flutter/material.dart';
 import 'package:animated_hero_carousel/src/indicators.dart';
 import 'package:animated_hero_carousel/src/carousel_core.dart';
@@ -9,7 +12,8 @@ import 'package:animated_hero_carousel/src/carousel_style.dart';
 
 class AnimatedHeroCarousel<T> extends StatefulWidget {
   final List<T> items;
-  final Widget Function(BuildContext context, T item, int index) itemBuilder;
+  final Widget Function(BuildContext context, T item, int index, PageController pageController)
+      itemBuilder;
   final Widget Function(T item, int index) detailBuilder;
   final String Function(T item, int actualIndex, int pageViewIndex) heroTagBuilder;
   final Axis scrollDirection;
@@ -28,8 +32,9 @@ class AnimatedHeroCarousel<T> extends StatefulWidget {
   final double? expandedHeight;
   final double? collapsedHeight;
   final Widget Function(BuildContext context)? dragHandleBuilder;
-  final double? parallaxFactor;
   final CarouselStyle? style;
+  final IndicatorType indicatorType;
+  final double? parallaxFactor;
 
   const AnimatedHeroCarousel({
     Key? key,
@@ -53,12 +58,14 @@ class AnimatedHeroCarousel<T> extends StatefulWidget {
     this.expandedHeight,
     this.collapsedHeight,
     this.dragHandleBuilder,
-    this.parallaxFactor,
     this.style,
+    this.indicatorType = IndicatorType.dot,
+    this.parallaxFactor,
   }) : super(key: key);
 
   @override
-  State<AnimatedHeroCarousel<T>> createState() => _AnimatedHeroCarouselState<T>();
+  State<AnimatedHeroCarousel<T>> createState() =>
+      _AnimatedHeroCarouselState<T>();
 }
 
 class _AnimatedHeroCarouselState<T> extends State<AnimatedHeroCarousel<T>> {
@@ -70,8 +77,11 @@ class _AnimatedHeroCarouselState<T> extends State<AnimatedHeroCarousel<T>> {
   void initState() {
     super.initState();
     _pageController = PageController(
-      initialPage: widget.loop ? (widget.items.length * 1000) + widget.initialIndex : widget.initialIndex,
-      viewportFraction: widget.viewportFraction ?? widget.style?.viewportFraction ?? 0.8,
+      initialPage: widget.loop
+          ? (widget.items.length * 1000) + widget.initialIndex
+          : widget.initialIndex,
+      viewportFraction:
+          widget.viewportFraction ?? widget.style?.viewportFraction ?? 0.8,
     );
     _currentIndexNotifier = ValueNotifier<int>(widget.initialIndex);
 
@@ -93,8 +103,12 @@ class _AnimatedHeroCarouselState<T> extends State<AnimatedHeroCarousel<T>> {
         int nextPage = _pageController.page!.round() + 1;
         _pageController.animateToPage(
           nextPage,
-          duration: widget.animationDuration ?? widget.style?.animationDuration ?? const Duration(milliseconds: 300),
-          curve: widget.animationCurve ?? widget.style?.animationCurve ?? Curves.ease,
+          duration: widget.animationDuration ??
+              widget.style?.animationDuration ??
+              const Duration(milliseconds: 300),
+          curve: widget.animationCurve ??
+              widget.style?.animationCurve ??
+              Curves.ease,
         );
       }
     });
@@ -125,7 +139,8 @@ class _AnimatedHeroCarouselState<T> extends State<AnimatedHeroCarousel<T>> {
             pageController: _pageController,
             scrollDirection: widget.scrollDirection,
             items: widget.items,
-            itemBuilder: widget.itemBuilder,
+            itemBuilder: (context, item, index, pageController) =>
+                widget.itemBuilder(context, item, index, pageController),
             detailBuilder: widget.detailBuilder,
             heroTagBuilder: (item, index, pageViewIndex) =>
                 widget.heroTagBuilder(item, index, pageViewIndex),
@@ -142,8 +157,7 @@ class _AnimatedHeroCarouselState<T> extends State<AnimatedHeroCarousel<T>> {
             expandedHeight: widget.expandedHeight,
             collapsedHeight: widget.collapsedHeight,
             dragHandleBuilder: widget.dragHandleBuilder,
-            parallaxFactor:
-                widget.parallaxFactor ?? widget.style?.parallaxFactor,
+            parallaxFactor: widget.parallaxFactor ?? widget.style?.parallaxFactor ?? 0.0,
           ),
         ),
         if (widget.showIndicators ?? widget.style?.showIndicators ?? false)
@@ -171,6 +185,7 @@ class _AnimatedHeroCarouselState<T> extends State<AnimatedHeroCarousel<T>> {
                           Curves.ease,
                     );
                   },
+                  indicatorType: widget.indicatorType,
                 );
               },
             ),

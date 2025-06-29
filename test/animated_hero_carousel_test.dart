@@ -27,7 +27,7 @@ void main() {
           home: Scaffold(
             body: AnimatedHeroCarousel<String>(
               items: const ['Item 1', 'Item 2', 'Item 3'],
-              itemBuilder: (context, item, index) => Text(item),
+              itemBuilder: (context, item, index, pageController) => Text(item),
               detailBuilder: (item, index) => Text('Detail for $item'),
               heroTagBuilder: (item, actualIndex, pageViewIndex) =>
                   'hero_${item}_${actualIndex}_$pageViewIndex',
@@ -63,7 +63,7 @@ void main() {
           home: Scaffold(
             body: AnimatedHeroCarousel<String>(
               items: const ['Item A', 'Item B'],
-              itemBuilder: (context, item, index) => Text(item),
+              itemBuilder: (context, item, index, pageController) => Text(item),
               detailBuilder: (item, index) => Text('Detail for $item'),
               heroTagBuilder: (item, actualIndex, pageViewIndex) =>
                   'hero_${item}_${actualIndex}_$pageViewIndex',
@@ -99,7 +99,7 @@ void main() {
           home: Scaffold(
             body: AnimatedHeroCarousel<String>(
               items: const ['Item 1', 'Item 2', 'Item 3'],
-              itemBuilder: (context, item, index) => Text(item),
+              itemBuilder: (context, item, index, pageController) => Text(item),
               detailBuilder: (item, index) => Text('Detail for $item'),
               heroTagBuilder: (item, actualIndex, pageViewIndex) => 'hero_${item}_${actualIndex}_$pageViewIndex',
               loop: true,
@@ -138,7 +138,7 @@ void main() {
           home: Scaffold(
             body: AnimatedHeroCarousel<String>(
               items: const ['Item 1', 'Item 2', 'Item 3'],
-              itemBuilder: (context, item, index) => Text(item),
+              itemBuilder: (context, item, index, pageController) => Text(item),
               detailBuilder: (item, index) => Text('Detail for $item'),
               heroTagBuilder: (item, actualIndex, pageViewIndex) =>
                   'hero_${item}_${actualIndex}_$pageViewIndex',
@@ -177,7 +177,7 @@ void main() {
           home: Scaffold(
             body: AnimatedHeroCarousel<String>(
               items: const ['Page 0', 'Page 1', 'Page 2'],
-              itemBuilder: (context, item, index) => Text(item),
+              itemBuilder: (context, item, index, pageController) => Text(item),
               detailBuilder: (item, index) => Text('Detail for $item'),
               heroTagBuilder: (item, actualIndex, pageViewIndex) =>
                   'hero_${item}_${actualIndex}_$pageViewIndex',
@@ -212,7 +212,7 @@ void main() {
           home: Scaffold(
             body: AnimatedHeroCarousel<String>(
               items: const ['Page 0', 'Page 1', 'Page 2'],
-              itemBuilder: (context, item, index) => Text(item),
+              itemBuilder: (context, item, index, pageController) => Text(item),
               detailBuilder: (item, index) => Text('Detail for $item'),
               heroTagBuilder: (item, actualIndex, pageViewIndex) =>
                   'hero_${item}_${actualIndex}_$pageViewIndex',
@@ -237,7 +237,7 @@ void main() {
           home: Scaffold(
             body: AnimatedHeroCarousel<String>(
               items: const ['Item 1'],
-              itemBuilder: (context, item, index) => Text(item),
+              itemBuilder: (context, item, index, pageController) => Text(item),
               detailBuilder: (item, index) => Text('Detail for $item'),
               heroTagBuilder: (item, actualIndex, pageViewIndex) => 'hero_${item}_${actualIndex}_$pageViewIndex',
               enableDragToExpand: true,
@@ -261,10 +261,10 @@ void main() {
           home: Scaffold(
             body: AnimatedHeroCarousel<String>(
               items: const ['Item 1', 'Item 2'],
-              itemBuilder: (context, item, index) => Container(key: Key('image_$index'), color: Colors.blue, width: 100, height: 100),
+              itemBuilder: (context, item, index, pageController) => Container(key: Key('image_$index'), color: Colors.blue, width: 100, height: 100),
               detailBuilder: (item, index) => Text('Detail for $item'),
               heroTagBuilder: (item, actualIndex, pageViewIndex) => 'hero_${item}_${actualIndex}_$pageViewIndex',
-              parallaxFactor: 0.5,
+              
               viewportFraction: 1.0, // Ensure only one item is visible at a time
             ),
           ),
@@ -290,7 +290,7 @@ void main() {
           home: Scaffold(
             body: AnimatedHeroCarousel<String>(
               items: const ['Item 1', 'Item 2'],
-              itemBuilder: (context, item, index) => const Text('Item'),
+              itemBuilder: (context, item, index, pageController) => const Text('Item'),
               detailBuilder: (item, index) => const Text('Detail'),
               heroTagBuilder: (item, actualIndex, pageViewIndex) =>
                   'hero_${item}_${actualIndex}_$pageViewIndex',
@@ -321,7 +321,7 @@ void main() {
           home: Scaffold(
             body: AnimatedHeroCarousel<String>(
               items: const ['Item 1', 'Item 2'],
-              itemBuilder: (context, item, index) => const Text('Item'),
+              itemBuilder: (context, item, index, pageController) => const Text('Item'),
               detailBuilder: (item, index) => const Text('Detail'),
               heroTagBuilder: (item, actualIndex, pageViewIndex) =>
                   'hero_${item}_${actualIndex}_$pageViewIndex',

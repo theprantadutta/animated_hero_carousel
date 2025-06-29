@@ -11,29 +11,49 @@ and the Flutter guide for
 [developing packages and plugins](https://flutter.dev/to/develop-packages).
 -->
 
-TODO: Put a short description of the package here that helps potential users
-know whether this package might be useful for them.
+A customizable and animated hero carousel for Flutter, with pre-built styles and support for different indicator types.
 
 ## Features
 
-TODO: List what your package can do. Maybe include images, gifs, or videos.
+*   **Hero Animations:** Smooth hero animations between the carousel and detail screens.
+*   **Customizable Styles:** Easily customize the carousel with pre-built styles or create your own.
+*   **Multiple Indicator Types:** Choose from `dot`, `bar`, and `worm` indicators.
+*   **Autoplay and Looping:** Enable autoplay and infinite looping for a dynamic experience.
+*   **Drag to Expand:** Support for drag-to-expand detail screens, similar to Apple Maps.
+*   **Parallax Effect:** Add a parallax effect to your carousel items for a sense of depth.
 
 ## Getting started
 
-TODO: List prerequisites and provide or point to information on how to
-start using the package.
+To use this package, add `animated_hero_carousel` as a dependency in your `pubspec.yaml` file.
+
+```yaml
+dependencies:
+  animated_hero_carousel: ^1.0.0
+```
 
 ## Usage
 
-TODO: Include short and useful examples for package users. Add longer examples
-to `/example` folder.
-
 ```dart
-const like = 'sample';
+import 'package:animated_hero_carousel/animated_hero_carousel.dart';
+
+// ...
+
+AnimatedHeroCarousel(
+  items: <String>['Item 1', 'Item 2', 'Item 3'],
+  itemBuilder: (BuildContext context, String item, int index) {
+    return // Your item widget;
+  },
+  detailBuilder: (String item, int index) {
+    return // Your detail widget;
+  },
+  heroTagBuilder: (String item, int actualIndex, int pageViewIndex) {
+    return 'hero_tag_${item}_${actualIndex}_$pageViewIndex';
+  },
+  indicatorType: IndicatorType.worm,
+  style: CarouselStyle.netflix(),
+);
 ```
 
 ## Additional information
 
-TODO: Tell users more about the package: where to find more information, how to
-contribute to the package, how to file issues, what response they can expect
-from the package authors, and more.
+For more information, check out the example in the `/example` folder. To contribute to the package, please file an issue or submit a pull request on GitHub.
