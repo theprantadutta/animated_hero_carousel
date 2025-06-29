@@ -5,6 +5,7 @@ import 'package:animated_hero_carousel/src/indicators.dart';
 import 'package:animated_hero_carousel/src/carousel_core.dart';
 import 'package:animated_hero_carousel/src/hero_carousel_controller.dart';
 import 'dart:async';
+import 'package:animated_hero_carousel/src/carousel_style.dart';
 
 class AnimatedHeroCarousel<T> extends StatefulWidget {
   final List<T> items;
@@ -13,16 +14,22 @@ class AnimatedHeroCarousel<T> extends StatefulWidget {
   final String Function(T item, int actualIndex, int pageViewIndex) heroTagBuilder;
   final Axis scrollDirection;
   final int initialIndex;
-  final double spacing;
+  final double? spacing;
   final Function(T item)? onItemTap;
-  final bool showIndicators;
-  final double viewportFraction;
-  final Duration animationDuration;
-  final Curve animationCurve;
+  final bool? showIndicators;
+  final double? viewportFraction;
+  final Duration? animationDuration;
+  final Curve? animationCurve;
   final bool loop;
   final bool autoplay;
   final Duration autoplayInterval;
   final HeroCarouselController? controller;
+  final bool enableDragToExpand;
+  final double? expandedHeight;
+  final double? collapsedHeight;
+  final Widget Function(BuildContext context)? dragHandleBuilder;
+  final double? parallaxFactor;
+  final CarouselStyle? style;
 
   const AnimatedHeroCarousel({
     Key? key,
@@ -32,16 +39,22 @@ class AnimatedHeroCarousel<T> extends StatefulWidget {
     required this.heroTagBuilder,
     this.scrollDirection = Axis.horizontal,
     this.initialIndex = 0,
-    this.spacing = 0.0,
+    this.spacing,
     this.onItemTap,
-    this.showIndicators = false,
-    this.viewportFraction = 0.8,
-    this.animationDuration = const Duration(milliseconds: 300),
-    this.animationCurve = Curves.ease,
+    this.showIndicators,
+    this.viewportFraction,
+    this.animationDuration,
+    this.animationCurve,
     this.loop = false,
     this.autoplay = false,
     this.autoplayInterval = const Duration(seconds: 3),
     this.controller,
+    this.enableDragToExpand = false,
+    this.expandedHeight,
+    this.collapsedHeight,
+    this.dragHandleBuilder,
+    this.parallaxFactor,
+    this.style,
   }) : super(key: key);
 
   @override
@@ -57,8 +70,8 @@ class _AnimatedHeroCarouselState<T> extends State<AnimatedHeroCarousel<T>> {
   void initState() {
     super.initState();
     _pageController = PageController(
-      initialPage: widget.loop ? (widget.items.length * 1000) + widget.initialIndex : widget.initialIndex, // Changed 1000000 to 1000
-      viewportFraction: widget.viewportFraction,
+      initialPage: widget.loop ? (widget.items.length * 1000) + widget.initialIndex : widget.initialIndex,
+      viewportFraction: widget.viewportFraction ?? widget.style?.viewportFraction ?? 0.8,
     );
     _currentIndexNotifier = ValueNotifier<int>(widget.initialIndex);
 
@@ -80,8 +93,8 @@ class _AnimatedHeroCarouselState<T> extends State<AnimatedHeroCarousel<T>> {
         int nextPage = _pageController.page!.round() + 1;
         _pageController.animateToPage(
           nextPage,
-          duration: widget.animationDuration,
-          curve: widget.animationCurve,
+          duration: widget.animationDuration ?? widget.style?.animationDuration ?? const Duration(milliseconds: 300),
+          curve: widget.animationCurve ?? widget.style?.animationCurve ?? Curves.ease,
         );
       }
     });
@@ -108,20 +121,32 @@ class _AnimatedHeroCarouselState<T> extends State<AnimatedHeroCarousel<T>> {
       children: [
         Expanded(
           child: CarouselCore<T>(
+            key: const Key('carousel_core'),
             pageController: _pageController,
             scrollDirection: widget.scrollDirection,
             items: widget.items,
             itemBuilder: widget.itemBuilder,
             detailBuilder: widget.detailBuilder,
-            heroTagBuilder: (item, index, pageViewIndex) => widget.heroTagBuilder(item, index, pageViewIndex),
-            spacing: widget.spacing,
+            heroTagBuilder: (item, index, pageViewIndex) =>
+                widget.heroTagBuilder(item, index, pageViewIndex),
+            spacing: widget.spacing ?? widget.style?.spacing ?? 0.0,
             onItemTap: widget.onItemTap,
-            animationDuration: widget.animationDuration,
-            animationCurve: widget.animationCurve,
+            animationDuration: widget.animationDuration ??
+                widget.style?.animationDuration ??
+                const Duration(milliseconds: 300),
+            animationCurve: widget.animationCurve ??
+                widget.style?.animationCurve ??
+                Curves.ease,
             itemCount: widget.loop ? null : widget.items.length,
+            enableDragToExpand: widget.enableDragToExpand,
+            expandedHeight: widget.expandedHeight,
+            collapsedHeight: widget.collapsedHeight,
+            dragHandleBuilder: widget.dragHandleBuilder,
+            parallaxFactor:
+                widget.parallaxFactor ?? widget.style?.parallaxFactor,
           ),
         ),
-        if (widget.showIndicators)
+        if (widget.showIndicators ?? widget.style?.showIndicators ?? false)
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: ValueListenableBuilder<int>(
@@ -130,6 +155,22 @@ class _AnimatedHeroCarouselState<T> extends State<AnimatedHeroCarousel<T>> {
                 return CarouselIndicators(
                   itemCount: widget.items.length,
                   currentIndex: currentIndex,
+                  onIndicatorTap: (index) {
+                    _pageController.animateToPage(
+                      widget.loop
+                          ? (_pageController.page!.round() ~/
+                                  widget.items.length *
+                                  widget.items.length) +
+                              index
+                          : index,
+                      duration: widget.animationDuration ??
+                          widget.style?.animationDuration ??
+                          const Duration(milliseconds: 300),
+                      curve: widget.animationCurve ??
+                          widget.style?.animationCurve ??
+                          Curves.ease,
+                    );
+                  },
                 );
               },
             ),

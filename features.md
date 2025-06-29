@@ -31,7 +31,7 @@ A widget that renders your carousel and manages hero animations.
 AnimatedHeroCarousel<T>(
   items: List<T>,
   itemBuilder: (context, item, index) => Widget,
-  heroTagBuilder: (item, index) => String,
+  heroTagBuilder: (item, actualIndex, pageViewIndex) => String,
   detailBuilder: (item, index) => Widget,
   scrollDirection: Axis.horizontal,
   showIndicators: true,
@@ -39,25 +39,6 @@ AnimatedHeroCarousel<T>(
   initialIndex: 0,
 )
 ```
-
----
-
-## 🛠️ Props (With Behaviors)
-
-| Prop                | Type                                               | Description                            |
-| ------------------- | -------------------------------------------------- | -------------------------------------- |
-| `items`             | `List<T>`                                          | Your data list (required)              |
-| `itemBuilder`       | `Widget Function(BuildContext, T item, int index)` | Builds the preview tile                |
-| `detailBuilder`     | `Widget Function(T item, int index)`               | What the detail screen looks like      |
-| `heroTagBuilder`    | `String Function(T item, int index)`               | Must be unique to match Hero widgets   |
-| `scrollDirection`   | `Axis`                                             | Horizontal or vertical carousel        |
-| `initialIndex`      | `int`                                              | Where the carousel starts              |
-| `spacing`           | `double`                                           | Space between carousel items           |
-| `onItemTap`         | `Function(T item)?`                                | Optional callback when item tapped     |
-| `showIndicators`    | `bool`                                             | Dot indicators toggle                  |
-| `viewportFraction`  | `double`                                           | Similar to `PageView`, default `0.8`   |
-| `animationDuration` | `Duration`                                         | Controls how fast Hero animation plays |
-| `animationCurve`    | `Curve`                                            | Customize the feel of the animation    |
 
 ---
 
@@ -104,11 +85,57 @@ AnimatedHeroCarousel<Movie>(
 
 ## 🧪 Bonus Features (Later Releases)
 
-* `loop: true` for infinite carousel
-* `autoplay: true` with custom interval
 * Support for **drag to expand** (like Apple Maps card)
 * Fancy `parallaxFactor` for images
-* Prebuilt styles like “Netflix”, “Instagram Stories”, “Spotify Cards”
+
+## 🛠️ Props (With Behaviors)
+
+| Prop                | Type                                               | Description                            |
+| ------------------- | -------------------------------------------------- | -------------------------------------- |
+| `items`             | `List<T>`                                          | Your data list (required)              |
+| `itemBuilder`       | `Widget Function(BuildContext, T item, int index)` | Builds the preview tile                |
+| `detailBuilder`     | `Widget Function(T item, int index)`               | What the detail screen looks like      |
+| `heroTagBuilder`    | `String Function(T item, int actualIndex, int pageViewIndex)` | Must be unique to match Hero widgets   |
+| `scrollDirection`   | `Axis`                                             | Horizontal or vertical carousel        |
+| `initialIndex`      | `int`                                              | Where the carousel starts              |
+| `spacing`           | `double`                                           | Space between carousel items           |
+| `onItemTap`         | `Function(T item)?`                                | Optional callback when item tapped     |
+| `showIndicators`    | `bool`                                             | Dot indicators toggle                  |
+| `viewportFraction`  | `double`                                           | Similar to `PageView`, default `0.8`   |
+| `animationDuration` | `Duration`                                         | Controls how fast Hero animation plays |
+| `animationCurve`    | `Curve`                                            | Customize the feel of the animation    |
+| `enableDragToExpand`| `bool`                                             | Enables drag-to-expand behavior        |
+| `expandedHeight`    | `double?`                                          | Max height when expanded               |
+| `collapsedHeight`   | `double?`                                          | Initial height when collapsed          |
+| `dragHandleBuilder` | `Widget Function(BuildContext context)?`           | Custom builder for the drag handle     |
+| `parallaxFactor`    | `double?`                                          | Controls the parallax effect intensity |
+| `style`             | `CarouselStyle?`                                   | Apply prebuilt carousel styles         |
+| `parallaxFactor`    | `double?`                                          | Controls the parallax effect intensity |
+
+---
+
+## 🛠️ Props (With Behaviors)
+
+| Prop                | Type                                               | Description                            |
+| ------------------- | -------------------------------------------------- | -------------------------------------- |
+| `items`             | `List<T>`                                          | Your data list (required)              |
+| `itemBuilder`       | `Widget Function(BuildContext, T item, int index)` | Builds the preview tile                |
+| `detailBuilder`     | `Widget Function(T item, int index)`               | What the detail screen looks like      |
+| `heroTagBuilder`    | `String Function(T item, int actualIndex, int pageViewIndex)` | Must be unique to match Hero widgets   |
+| `scrollDirection`   | `Axis`                                             | Horizontal or vertical carousel        |
+| `initialIndex`      | `int`                                              | Where the carousel starts              |
+| `spacing`           | `double`                                           | Space between carousel items           |
+| `onItemTap`         | `Function(T item)?`                                | Optional callback when item tapped     |
+| `showIndicators`    | `bool`                                             | Dot indicators toggle                  |
+| `viewportFraction`  | `double`                                           | Similar to `PageView`, default `0.8`   |
+| `animationDuration` | `Duration`                                         | Controls how fast Hero animation plays |
+| `animationCurve`    | `Curve`                                            | Customize the feel of the animation    |
+| `enableDragToExpand`| `bool`                                             | Enables drag-to-expand behavior        |
+| `expandedHeight`    | `double?`                                          | Max height when expanded               |
+| `collapsedHeight`   | `double?`                                          | Initial height when collapsed          |
+| `dragHandleBuilder` | `Widget Function(BuildContext context)?`           | Custom builder for the drag handle     |
+
+---
 
 ---
 

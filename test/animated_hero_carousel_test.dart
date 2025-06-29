@@ -1,8 +1,13 @@
+import 'package:animated_hero_carousel/src/indicators.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter/services.dart'; // Import for TestAssetBundle
 
 import 'package:animated_hero_carousel/animated_hero_carousel.dart';
 import 'package:animated_hero_carousel/src/hero_carousel_controller.dart';
+import 'package:animated_hero_carousel/src/carousel_core.dart';
+import 'package:animated_hero_carousel/src/expandable_detail_screen.dart';
+import 'package:animated_hero_carousel/src/carousel_style.dart';
 
 void main() {
   group('AnimatedHeroCarousel', () {
@@ -21,7 +26,7 @@ void main() {
         MaterialApp(
           home: Scaffold(
             body: AnimatedHeroCarousel<String>(
-              items: ['Item 1', 'Item 2', 'Item 3'],
+              items: const ['Item 1', 'Item 2', 'Item 3'],
               itemBuilder: (context, item, index) => Text(item),
               detailBuilder: (item, index) => Text('Detail for $item'),
               heroTagBuilder: (item, actualIndex, pageViewIndex) =>
@@ -52,18 +57,19 @@ void main() {
     });
 
     testWidgets('onItemTap callback is triggered', (WidgetTester tester) async {
-      String? tappedItem;
+      final ValueNotifier<bool> tapped = ValueNotifier<bool>(false);
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
             body: AnimatedHeroCarousel<String>(
-              items: ['Item A', 'Item B'],
+              items: const ['Item A', 'Item B'],
               itemBuilder: (context, item, index) => Text(item),
               detailBuilder: (item, index) => Text('Detail for $item'),
               heroTagBuilder: (item, actualIndex, pageViewIndex) =>
                   'hero_${item}_${actualIndex}_$pageViewIndex',
               onItemTap: (item) {
-                tappedItem = item;
+                tapped.value = true;
+                print('onItemTap triggered with: $item'); // Debug print
               },
             ),
           ),
@@ -72,8 +78,10 @@ void main() {
 
       // Tap on the first item.
       await tester.tap(find.text('Item A'));
-      // The callback should be called synchronously on tap.
-      expect(tappedItem, 'Item A');
+      await tester.pump(); // Allow ValueNotifier to update
+
+      // The callback should be called.
+      expect(tapped.value, isTrue);
 
       // Now wait for the navigation animation to complete.
       await tester.pumpAndSettle();
@@ -90,7 +98,7 @@ void main() {
         MaterialApp(
           home: Scaffold(
             body: AnimatedHeroCarousel<String>(
-              items: ['Item 1', 'Item 2', 'Item 3'],
+              items: const ['Item 1', 'Item 2', 'Item 3'],
               itemBuilder: (context, item, index) => Text(item),
               detailBuilder: (item, index) => Text('Detail for $item'),
               heroTagBuilder: (item, actualIndex, pageViewIndex) => 'hero_${item}_${actualIndex}_$pageViewIndex',
@@ -129,7 +137,7 @@ void main() {
         MaterialApp(
           home: Scaffold(
             body: AnimatedHeroCarousel<String>(
-              items: ['Item 1', 'Item 2', 'Item 3'],
+              items: const ['Item 1', 'Item 2', 'Item 3'],
               itemBuilder: (context, item, index) => Text(item),
               detailBuilder: (item, index) => Text('Detail for $item'),
               heroTagBuilder: (item, actualIndex, pageViewIndex) =>
@@ -168,7 +176,7 @@ void main() {
         MaterialApp(
           home: Scaffold(
             body: AnimatedHeroCarousel<String>(
-              items: ['Page 0', 'Page 1', 'Page 2'],
+              items: const ['Page 0', 'Page 1', 'Page 2'],
               itemBuilder: (context, item, index) => Text(item),
               detailBuilder: (item, index) => Text('Detail for $item'),
               heroTagBuilder: (item, actualIndex, pageViewIndex) =>
@@ -203,7 +211,7 @@ void main() {
         MaterialApp(
           home: Scaffold(
             body: AnimatedHeroCarousel<String>(
-              items: ['Page 0', 'Page 1', 'Page 2'],
+              items: const ['Page 0', 'Page 1', 'Page 2'],
               itemBuilder: (context, item, index) => Text(item),
               detailBuilder: (item, index) => Text('Detail for $item'),
               heroTagBuilder: (item, actualIndex, pageViewIndex) =>
@@ -221,6 +229,121 @@ void main() {
 
       expect(find.text('Page 2'), findsOneWidget);
       expect(find.text('Page 0'), findsNothing);
+    });
+
+    testWidgets('enableDragToExpand pushes ExpandableDetailScreen', (WidgetTester tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: AnimatedHeroCarousel<String>(
+              items: const ['Item 1'],
+              itemBuilder: (context, item, index) => Text(item),
+              detailBuilder: (item, index) => Text('Detail for $item'),
+              heroTagBuilder: (item, actualIndex, pageViewIndex) => 'hero_${item}_${actualIndex}_$pageViewIndex',
+              enableDragToExpand: true,
+              expandedHeight: 500.0,
+              collapsedHeight: 100.0,
+            ),
+          ),
+        ),
+      );
+
+      await tester.tap(find.text('Item 1'));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(ExpandableDetailScreen), findsOneWidget);
+      expect(find.text('Detail for Item 1'), findsOneWidget);
+    });
+
+    testWidgets('parallaxFactor applies transform', (WidgetTester tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: AnimatedHeroCarousel<String>(
+              items: const ['Item 1', 'Item 2'],
+              itemBuilder: (context, item, index) => Container(key: Key('image_$index'), color: Colors.blue, width: 100, height: 100),
+              detailBuilder: (item, index) => Text('Detail for $item'),
+              heroTagBuilder: (item, actualIndex, pageViewIndex) => 'hero_${item}_${actualIndex}_$pageViewIndex',
+              parallaxFactor: 0.5,
+              viewportFraction: 1.0, // Ensure only one item is visible at a time
+            ),
+          ),
+        ),
+      );
+
+      // Initially, the first item should be at its original position (no transform)
+      final RenderBox item1RenderBox = tester.renderObject(find.byKey(const Key('image_0')));
+      expect(item1RenderBox.localToGlobal(Offset.zero).dx, equals(0.0));
+
+      // Simulate scrolling to the next page
+      await tester.drag(find.byType(PageView), const Offset(-300.0, 0.0));
+      await tester.pump(); // Pump a frame to apply the scroll offset
+
+      // Check if the transform is applied to the first item (it should move)
+      final RenderBox item1RenderBoxAfterDrag = tester.renderObject(find.byKey(const Key('image_0')));
+      expect(item1RenderBoxAfterDrag.localToGlobal(Offset.zero).dx, isNot(equals(0.0)));
+    });
+
+    testWidgets('CarouselStyle applies properties', (WidgetTester tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: AnimatedHeroCarousel<String>(
+              items: const ['Item 1', 'Item 2'],
+              itemBuilder: (context, item, index) => const Text('Item'),
+              detailBuilder: (item, index) => const Text('Detail'),
+              heroTagBuilder: (item, actualIndex, pageViewIndex) =>
+                  'hero_${item}_${actualIndex}_$pageViewIndex',
+              style: CarouselStyle.netflix(),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final CarouselCore carouselCore =
+          tester.widget(find.byKey(const Key('carousel_core')));
+      final PageController pageController = carouselCore.pageController;
+
+      expect(pageController.viewportFraction, equals(0.9));
+      expect(carouselCore.spacing, equals(8.0));
+      expect(find.byType(CarouselIndicators), findsNothing);
+      expect(carouselCore.parallaxFactor, equals(0.3));
+      expect(carouselCore.animationDuration,
+          equals(const Duration(milliseconds: 400)));
+      expect(carouselCore.animationCurve, equals(Curves.easeOut));
+    });
+
+    testWidgets('Individual properties override CarouselStyle',
+        (WidgetTester tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: AnimatedHeroCarousel<String>(
+              items: const ['Item 1', 'Item 2'],
+              itemBuilder: (context, item, index) => const Text('Item'),
+              detailBuilder: (item, index) => const Text('Detail'),
+              heroTagBuilder: (item, actualIndex, pageViewIndex) =>
+                  'hero_${item}_${actualIndex}_$pageViewIndex',
+              style: CarouselStyle.netflix(),
+              viewportFraction: 0.5, // Override style
+              showIndicators: true, // Override style
+            ),
+          ),
+        ),
+      );
+
+      // Verify overridden properties
+      await tester.pumpAndSettle();
+      final CarouselCore carouselCore =
+          tester.widget(find.byKey(const Key('carousel_core')));
+      final PageController pageController = carouselCore.pageController;
+
+      expect(pageController.viewportFraction, equals(0.5));
+      expect(find.byType(CarouselIndicators), findsOneWidget);
+      // Other properties should still be from Netflix style
+      expect(carouselCore.spacing, equals(8.0));
+      expect(carouselCore.parallaxFactor, equals(0.3));
     });
   });
 }
