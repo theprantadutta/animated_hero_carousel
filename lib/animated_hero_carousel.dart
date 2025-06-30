@@ -1,5 +1,3 @@
-library animated_hero_carousel;
-
 export 'src/carousel_style.dart';
 export 'src/indicators.dart';
 
@@ -10,34 +8,114 @@ import 'package:animated_hero_carousel/src/hero_carousel_controller.dart';
 import 'dart:async';
 import 'package:animated_hero_carousel/src/carousel_style.dart';
 
+/// A highly customizable and animated hero carousel widget for Flutter.
+///
+/// This widget provides a carousel with smooth hero animations,
+/// various indicator types, and pre-built styles.
 class AnimatedHeroCarousel<T> extends StatefulWidget {
+  /// The list of data items to display in the carousel.
   final List<T> items;
-  final Widget Function(BuildContext context, T item, int index, PageController pageController)
-      itemBuilder;
+
+  /// A builder function that returns the widget for each carousel item.
+  ///
+  /// Provides access to the `PageController` for custom effects like parallax.
+  final Widget Function(
+    BuildContext context,
+    T item,
+    int index,
+    PageController pageController,
+  ) itemBuilder;
+
+  /// A builder function that returns the widget for the detail screen,
+  /// which is shown when an item is tapped.
   final Widget Function(T item, int index) detailBuilder;
-  final String Function(T item, int actualIndex, int pageViewIndex) heroTagBuilder;
+
+  /// A function that returns a unique hero tag for each item
+  /// to enable the transition animation.
+  final String Function(T item, int actualIndex, int pageViewIndex)
+      heroTagBuilder;
+
+  /// The axis along which the carousel scrolls. Defaults to `Axis.horizontal`.
   final Axis scrollDirection;
+
+  /// The initial page index to display. Defaults to `0`.
   final int initialIndex;
+
+  /// The spacing between carousel items.
+  ///
+  /// If a `style` is provided, this value will be overridden by the style's spacing.
   final double? spacing;
+
+  /// A callback function that is invoked when a carousel item is tapped.
   final Function(T item)? onItemTap;
+
+  /// Whether to display the page indicators.
+  ///
+  /// If a `style` is provided, this value will be overridden. Defaults to `true`.
   final bool? showIndicators;
+
+  /// The fraction of the viewport that each page should occupy.
+  ///
+  /// If a `style` is provided, this value will be overridden.
   final double? viewportFraction;
+
+  /// The duration of the page transition animation.
+  ///
+  /// If a `style` is provided, this value will be overridden.
   final Duration? animationDuration;
+
+  /// The curve of the page transition animation.
+  ///
+  /// If a `style` is provided, this value will be overridden.
   final Curve? animationCurve;
+
+  /// Whether the carousel should loop infinitely. Defaults to `false`.
   final bool loop;
+
+  /// Whether the carousel should autoplay. Defaults to `false`.
   final bool autoplay;
+
+  /// The time interval between autoplay transitions. Defaults to `3 seconds`.
   final Duration autoplayInterval;
+
+  /// An optional controller to programmatically control the carousel.
   final HeroCarouselController? controller;
+
+  /// Whether to enable the drag-to-expand functionality on the detail screen.
+  /// Defaults to `false`.
   final bool enableDragToExpand;
+
+  /// The height of the detail screen when fully expanded.
+  ///
+  /// **Required** if `enableDragToExpand` is `true`.
   final double? expandedHeight;
+
+  /// The height of the detail screen when collapsed.
+  ///
+  /// **Required** if `enableDragToExpand` is `true`.
   final double? collapsedHeight;
+
+  /// An optional builder for a custom drag handle on the expandable detail screen.
   final Widget Function(BuildContext context)? dragHandleBuilder;
+
+  /// A pre-defined or custom `CarouselStyle` to apply to the carousel.
+  ///
+  /// Overrides individual styling properties.
   final CarouselStyle? style;
+
+  /// The type of indicator to display.
+  ///
+  /// Can be `dot`, `bar`, or `worm`. Defaults to `dot`.
   final IndicatorType indicatorType;
+
+  /// The parallax effect factor.
+  ///
+  /// A value between `0.0` and `1.0` is recommended.
+  /// If a `style` is provided, this value will be overridden.
   final double? parallaxFactor;
 
   const AnimatedHeroCarousel({
-    Key? key,
+    super.key,
     required this.items,
     required this.itemBuilder,
     required this.detailBuilder,
@@ -61,7 +139,7 @@ class AnimatedHeroCarousel<T> extends StatefulWidget {
     this.style,
     this.indicatorType = IndicatorType.dot,
     this.parallaxFactor,
-  }) : super(key: key);
+  });
 
   @override
   State<AnimatedHeroCarousel<T>> createState() =>
@@ -157,7 +235,8 @@ class _AnimatedHeroCarouselState<T> extends State<AnimatedHeroCarousel<T>> {
             expandedHeight: widget.expandedHeight,
             collapsedHeight: widget.collapsedHeight,
             dragHandleBuilder: widget.dragHandleBuilder,
-            parallaxFactor: widget.parallaxFactor ?? widget.style?.parallaxFactor ?? 0.0,
+            parallaxFactor:
+                widget.parallaxFactor ?? widget.style?.parallaxFactor ?? 0.0,
           ),
         ),
         if (widget.showIndicators ?? widget.style?.showIndicators ?? false)

@@ -1,18 +1,29 @@
 import 'package:flutter/material.dart';
 
+/// A screen that can be dragged to expand or collapse, revealing more detail.
+///
+/// This widget is used to create an interactive detail view that can be
+/// partially or fully displayed.
 class ExpandableDetailScreen extends StatefulWidget {
+  /// The main content of the detail screen.
   final Widget detailWidget;
+
+  /// The height of the screen when fully expanded.
   final double expandedHeight;
+
+  /// The height of the screen when collapsed.
   final double collapsedHeight;
+
+  /// An optional builder for a custom drag handle.
   final Widget Function(BuildContext context)? dragHandleBuilder;
 
   const ExpandableDetailScreen({
-    Key? key,
+    super.key,
     required this.detailWidget,
     required this.expandedHeight,
     required this.collapsedHeight,
     this.dragHandleBuilder,
-  }) : super(key: key);
+  });
 
   @override
   _ExpandableDetailScreenState createState() => _ExpandableDetailScreenState();
@@ -43,7 +54,8 @@ class _ExpandableDetailScreenState extends State<ExpandableDetailScreen> {
   }
 
   void _onVerticalDragEnd(DragEndDetails details) {
-    if (_currentHeightNotifier.value > (widget.expandedHeight + widget.collapsedHeight) / 2) {
+    if (_currentHeightNotifier.value >
+        (widget.expandedHeight + widget.collapsedHeight) / 2) {
       _currentHeightNotifier.value = widget.expandedHeight;
     } else {
       _currentHeightNotifier.value = widget.collapsedHeight;
@@ -73,7 +85,8 @@ class _ExpandableDetailScreenState extends State<ExpandableDetailScreen> {
                     width: double.infinity,
                     decoration: BoxDecoration(
                       color: Colors.white, // Or any background color
-                      borderRadius: BorderRadius.vertical(top: Radius.circular(16.0)),
+                      borderRadius:
+                          const BorderRadius.vertical(top: Radius.circular(16.0)),
                       boxShadow: [
                         BoxShadow(
                           color: Colors.black.withOpacity(0.1),
@@ -91,7 +104,7 @@ class _ExpandableDetailScreenState extends State<ExpandableDetailScreen> {
                             key: const Key('defaultDragHandle'),
                             height: 20,
                             width: 40,
-                            margin: EdgeInsets.symmetric(vertical: 8),
+                            margin: const EdgeInsets.symmetric(vertical: 8),
                             decoration: BoxDecoration(
                               color: Colors.grey[300],
                               borderRadius: BorderRadius.circular(10),

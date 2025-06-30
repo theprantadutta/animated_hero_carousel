@@ -12,18 +12,37 @@ enum IndicatorType {
   worm,
 }
 
+/// A widget that displays indicators for a `PageView`.
+///
+/// This widget can display different types of indicators, such as dots, bars,
+/// or a "worm" style indicator.
 class CarouselIndicators extends StatelessWidget {
+  /// The total number of items in the carousel.
   final int itemCount;
+
+  /// The index of the currently active item.
   final int currentIndex;
+
+  /// The color of the active indicator.
   final Color activeColor;
+
+  /// The color of the inactive indicators.
   final Color inactiveColor;
+
+  /// The size of the indicator.
   final double dotSize;
+
+  /// The spacing between indicators.
   final double spacing;
+
+  /// A callback function that is invoked when an indicator is tapped.
   final Function(int)? onIndicatorTap;
+
+  /// The type of indicator to display.
   final IndicatorType indicatorType;
 
   const CarouselIndicators({
-    Key? key,
+    super.key,
     required this.itemCount,
     required this.currentIndex,
     this.activeColor = Colors.blue,
@@ -32,7 +51,7 @@ class CarouselIndicators extends StatelessWidget {
     this.spacing = 8.0,
     this.onIndicatorTap,
     this.indicatorType = IndicatorType.dot,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -54,7 +73,6 @@ class CarouselIndicators extends StatelessWidget {
       case IndicatorType.worm:
         return _buildWormIndicator(index);
       case IndicatorType.dot:
-      default:
         return _buildDotIndicator(index);
     }
   }

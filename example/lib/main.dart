@@ -8,12 +8,16 @@ class Movie {
   final String posterUrl;
   final String backdropUrl;
   final String description;
+  final String releaseYear;
+  final double rating;
 
   const Movie({
     required this.title,
     required this.posterUrl,
     required this.backdropUrl,
     required this.description,
+    required this.releaseYear,
+    required this.rating,
   });
 }
 
@@ -26,6 +30,8 @@ const List<Movie> movieData = [
     backdropUrl:
         'https://image.tmdb.org/t/p/original/6WxhEvFsauuACfv8HyoVX6mZKFj.jpg',
     description: 'The sixth installment in the Final Destination franchise.',
+    releaseYear: '2025',
+    rating: 7.5,
   ),
   Movie(
     title: 'Lilo & Stitch',
@@ -35,6 +41,8 @@ const List<Movie> movieData = [
         'https://image.tmdb.org/t/p/original/7c5VBuCbjZOk7lSfj9sMpmDIaKX.jpg',
     description:
         'A tale of a young girl\'s close encounter with the galaxy\'s most wanted extraterrestrial.',
+    releaseYear: '2002',
+    rating: 7.3,
   ),
   Movie(
     title: 'The Twisters',
@@ -43,6 +51,8 @@ const List<Movie> movieData = [
     backdropUrl:
         'https://image.tmdb.org/t/p/original/8OP3h80BzIDgmMNANVaYlQ6H4Oc.jpg',
     description: 'A current-day chapter of the 1996 blockbuster, Twister.',
+    releaseYear: '2024',
+    rating: 6.8,
   ),
   Movie(
     title: 'Distant',
@@ -52,6 +62,8 @@ const List<Movie> movieData = [
         'https://image.tmdb.org/t/p/original/czh8HOhsbBUKoKsmRmLQMCLHUev.jpg',
     description:
         'An asteroid miner crash-lands on an alien planet and must make his way across the harsh terrain.',
+    releaseYear: '2024',
+    rating: 5.9,
   ),
   Movie(
     title: 'First Shift',
@@ -61,6 +73,8 @@ const List<Movie> movieData = [
         'https://image.tmdb.org/t/p/original/ajsGI4JYaciPIe3gPgiJ3Vw5Vre.jpg',
     description:
         'As a new rookie, one of the cops has to apprehend a gang of violent criminals on his first night shift.',
+    releaseYear: '2024',
+    rating: 4.5,
   ),
   Movie(
     title: 'K-Pop: Demon Hunters',
@@ -70,6 +84,8 @@ const List<Movie> movieData = [
         'https://image.tmdb.org/t/p/original/jfS5KEfiwsS35ieZvdUdJKkwLlZ.jpg',
     description:
         'A world-renowned K-Pop girl group secretly moonlights as demon hunters.',
+    releaseYear: '2025',
+    rating: 8.0,
   ),
   Movie(
     title: 'How to Train Your Dragon',
@@ -79,6 +95,8 @@ const List<Movie> movieData = [
         'https://image.tmdb.org/t/p/original/q5pXRYTycaeW6dEgsCrd4mYPmxM.jpg',
     description:
         'A hapless young Viking who aspires to hunt dragons becomes the unlikely friend of a young dragon himself.',
+    releaseYear: '2010',
+    rating: 7.9,
   ),
 ];
 
@@ -93,6 +111,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Animated Hero Carousel Demo',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData.dark().copyWith(
         scaffoldBackgroundColor: const Color(0xFF121212),
         primaryColor: Colors.blueAccent,
@@ -181,19 +200,28 @@ class MovieCarouselExample extends StatelessWidget {
 
   /// Tab 3: A redesigned vertical carousel that looks like a watchlist.
   Widget _buildVerticalListCarousel() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-      child: AnimatedHeroCarousel(
-        items: movieData,
-        scrollDirection: Axis.vertical,
-        showIndicators: false, // Indicators are less common for list views
-        loop: false,
-        spacing: 20.0,
-        itemBuilder: (context, movie, index, pageController) =>
-            _buildWatchlistItem(movie),
-        detailBuilder: (movie, index) => _buildDetailScreen(movie),
-        heroTagBuilder: (movie, actualIndex, pageViewIndex) =>
-            'watchlist_${movie.title}_$actualIndex',
+    return Center(
+      child: SizedBox(
+        height: 600, // Increased height for a bigger watchlist
+        child: Row(
+          children: [
+            Expanded(
+              child: AnimatedHeroCarousel(
+                items: movieData,
+                scrollDirection: Axis.vertical,
+                showIndicators: true, // Show indicators for vertical scroll
+                indicatorType: IndicatorType.bar, // Bar indicators for vertical
+                loop: false,
+                spacing: 20.0,
+                itemBuilder: (context, movie, index, pageController) =>
+                    _buildWatchlistItem(movie),
+                detailBuilder: (movie, index) => _buildDetailScreen(movie),
+                heroTagBuilder: (movie, actualIndex, pageViewIndex) =>
+                    'watchlist_${movie.title}_$actualIndex',
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -233,37 +261,66 @@ class MovieCarouselExample extends StatelessWidget {
 
   /// A new list item design for the vertical carousel.
   Widget _buildWatchlistItem(Movie movie) {
-    return Row(
-      children: [
-        SizedBox(width: 100, child: _buildPosterCard(movie)),
-        const SizedBox(width: 20),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                movie.title,
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 16.0),
+      decoration: BoxDecoration(
+        color: Colors.grey[900],
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        children: [
+          SizedBox(width: 120, child: _buildPosterCard(movie)), // Increased width
+          const SizedBox(width: 20),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  movie.title,
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                movie.description,
-                maxLines: 3,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.white.withOpacity(0.7),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    Icon(Icons.star, color: Colors.amber, size: 16),
+                    const SizedBox(width: 4),
+                    Text(
+                      '${movie.rating}/10 IMDb',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.white.withOpacity(0.8),
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Text(
+                      movie.releaseYear,
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.white.withOpacity(0.8),
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-            ],
+                const SizedBox(height: 8),
+                Text(
+                  movie.description,
+                  maxLines: 4, // Increased max lines
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.white.withOpacity(0.7),
+                  ),
+                ),
+              ],
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
