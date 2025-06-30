@@ -1,3 +1,13 @@
+## 2.0.0
+
+* Added various carousel styles to choose from.
+* Implemented vertical carousel mode.
+* Added parallax effect to the carousel.
+* Added an expandable detail screen for items.
+* Added indicators for the carousel.
+* Added a hero transition for the detail screen.
+* Added a controller to programmatically control the carousel.
+
 ## 1.0.1
 
 * Added CI workflow with GitHub Actions.

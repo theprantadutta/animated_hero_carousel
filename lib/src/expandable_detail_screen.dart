@@ -26,10 +26,10 @@ class ExpandableDetailScreen extends StatefulWidget {
   });
 
   @override
-  _ExpandableDetailScreenState createState() => _ExpandableDetailScreenState();
+  State<ExpandableDetailScreen> createState() => ExpandableDetailScreenState();
 }
 
-class _ExpandableDetailScreenState extends State<ExpandableDetailScreen> {
+class ExpandableDetailScreenState extends State<ExpandableDetailScreen> {
   late ValueNotifier<double> _currentHeightNotifier;
 
   @override
@@ -69,7 +69,8 @@ class _ExpandableDetailScreenState extends State<ExpandableDetailScreen> {
         children: [
           // Background content (e.g., the main carousel item)
           // This will be handled by the HeroTransitionPage
-          Center(child: Text('Background Content (Placeholder)')), // Placeholder
+          Center(
+              child: Text('Background Content (Placeholder)')), // Placeholder
 
           Align(
             alignment: Alignment.bottomCenter,
@@ -85,11 +86,11 @@ class _ExpandableDetailScreenState extends State<ExpandableDetailScreen> {
                     width: double.infinity,
                     decoration: BoxDecoration(
                       color: Colors.white, // Or any background color
-                      borderRadius:
-                          const BorderRadius.vertical(top: Radius.circular(16.0)),
+                      borderRadius: const BorderRadius.vertical(
+                          top: Radius.circular(16.0)),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
+                          color: Colors.black.withValues(alpha: 0.1),
                           blurRadius: 10,
                           spreadRadius: 5,
                         ),

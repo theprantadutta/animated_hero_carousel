@@ -12,8 +12,7 @@ class HeroTransitionPage<T> extends PageRouteBuilder {
   /// The widget to display on the detail screen.
   final Widget detailWidget;
 
-  @override
-  final Duration transitionDuration;
+  final Duration _transitionDuration;
 
   /// The curve of the hero transition.
   final Curve animationCurve;
@@ -33,14 +32,14 @@ class HeroTransitionPage<T> extends PageRouteBuilder {
   HeroTransitionPage({
     required this.heroTag,
     required this.detailWidget,
-    required this.transitionDuration,
+    required super.transitionDuration,
     required this.animationCurve,
     this.enableDragToExpand = false,
     this.expandedHeight,
     this.collapsedHeight,
     this.dragHandleBuilder,
-  }) : super(
-          transitionDuration: transitionDuration,
+  })  : _transitionDuration = transitionDuration,
+        super(
           pageBuilder: (context, animation, secondaryAnimation) {
             return FadeTransition(
               opacity: animation,
@@ -58,4 +57,7 @@ class HeroTransitionPage<T> extends PageRouteBuilder {
             );
           },
         );
+
+  @override
+  Duration get transitionDuration => _transitionDuration;
 }

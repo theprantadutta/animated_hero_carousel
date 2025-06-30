@@ -105,7 +105,7 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -115,7 +115,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData.dark().copyWith(
         scaffoldBackgroundColor: const Color(0xFF121212),
         primaryColor: Colors.blueAccent,
-        indicatorColor: Colors.blueAccent,
+        tabBarTheme: TabBarThemeData(indicatorColor: Colors.blueAccent),
       ),
       home: const MovieCarouselExample(),
     );
@@ -123,7 +123,7 @@ class MyApp extends StatelessWidget {
 }
 
 class MovieCarouselExample extends StatelessWidget {
-  const MovieCarouselExample({Key? key}) : super(key: key);
+  const MovieCarouselExample({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -235,7 +235,7 @@ class MovieCarouselExample extends StatelessWidget {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.5),
+              color: Colors.black.withValues(alpha: 0.5),
               blurRadius: 20,
               offset: const Offset(0, 10),
             ),
@@ -269,7 +269,10 @@ class MovieCarouselExample extends StatelessWidget {
       ),
       child: Row(
         children: [
-          SizedBox(width: 120, child: _buildPosterCard(movie)), // Increased width
+          SizedBox(
+            width: 120,
+            child: _buildPosterCard(movie),
+          ), // Increased width
           const SizedBox(width: 20),
           Expanded(
             child: Column(
@@ -293,7 +296,7 @@ class MovieCarouselExample extends StatelessWidget {
                       '${movie.rating}/10 IMDb',
                       style: TextStyle(
                         fontSize: 14,
-                        color: Colors.white.withOpacity(0.8),
+                        color: Colors.white.withValues(alpha: 0.8),
                       ),
                     ),
                     const SizedBox(width: 16),
@@ -301,7 +304,7 @@ class MovieCarouselExample extends StatelessWidget {
                       movie.releaseYear,
                       style: TextStyle(
                         fontSize: 14,
-                        color: Colors.white.withOpacity(0.8),
+                        color: Colors.white.withValues(alpha: 0.8),
                       ),
                     ),
                   ],
@@ -313,7 +316,7 @@ class MovieCarouselExample extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontSize: 14,
-                    color: Colors.white.withOpacity(0.7),
+                    color: Colors.white.withValues(alpha: 0.7),
                   ),
                 ),
               ],
@@ -334,7 +337,7 @@ class MovieCarouselExample extends StatelessWidget {
           ClipRRect(
             child: BackdropFilter(
               filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-              child: Container(color: Colors.black.withOpacity(0.6)),
+              child: Container(color: Colors.black.withValues(alpha: 0.6)),
             ),
           ),
           SingleChildScrollView(
@@ -360,7 +363,7 @@ class MovieCarouselExample extends StatelessWidget {
                     movie.description,
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      color: Colors.white.withOpacity(0.8),
+                      color: Colors.white.withValues(alpha: 0.8),
                       fontSize: 16,
                       height: 1.5,
                     ),
@@ -373,7 +376,7 @@ class MovieCarouselExample extends StatelessWidget {
             top: 40,
             left: 16,
             child: CircleAvatar(
-              backgroundColor: Colors.black.withOpacity(0.5),
+              backgroundColor: Colors.black.withValues(alpha: 0.5),
               child: BackButton(color: Colors.white),
             ),
           ),
@@ -390,17 +393,17 @@ class ParallaxMovieCard extends StatefulWidget {
   final int pageIndex;
 
   const ParallaxMovieCard({
-    Key? key,
+    super.key,
     required this.movie,
     required this.pageController,
     required this.pageIndex,
-  }) : super(key: key);
+  });
 
   @override
-  _ParallaxMovieCardState createState() => _ParallaxMovieCardState();
+  ParallaxMovieCardState createState() => ParallaxMovieCardState();
 }
 
-class _ParallaxMovieCardState extends State<ParallaxMovieCard> {
+class ParallaxMovieCardState extends State<ParallaxMovieCard> {
   double _offset = 0.0;
 
   @override
@@ -444,7 +447,7 @@ class _ParallaxMovieCardState extends State<ParallaxMovieCard> {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.5),
+              color: Colors.black.withValues(alpha: 0.5),
               blurRadius: 20,
               offset: const Offset(0, 10),
             ),

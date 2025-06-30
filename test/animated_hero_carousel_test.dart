@@ -1,13 +1,11 @@
-import 'package:animated_hero_carousel/src/indicators.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter/services.dart'; // Import for TestAssetBundle
+// Import for TestAssetBundle
 
 import 'package:animated_hero_carousel/animated_hero_carousel.dart';
 import 'package:animated_hero_carousel/src/hero_carousel_controller.dart';
 import 'package:animated_hero_carousel/src/carousel_core.dart';
 import 'package:animated_hero_carousel/src/expandable_detail_screen.dart';
-import 'package:animated_hero_carousel/src/carousel_style.dart';
 
 void main() {
   group('AnimatedHeroCarousel', () {
@@ -69,7 +67,7 @@ void main() {
                   'hero_${item}_${actualIndex}_$pageViewIndex',
               onItemTap: (item) {
                 tapped.value = true;
-                print('onItemTap triggered with: $item'); // Debug print
+                // print('onItemTap triggered with: $item'); // Debug print
               },
             ),
           ),
