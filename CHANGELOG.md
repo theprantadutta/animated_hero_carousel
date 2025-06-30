@@ -1,3 +1,9 @@
+## 1.0.1
+
+* Added CI workflow with GitHub Actions.
+* Added badges for build status, pub.dev version, license, and style to `README.md`.
+* Updated `LICENSE` file with MIT License.
+
 ## 1.0.0
 
 * Initial release of the `animated_hero_carousel` package.
