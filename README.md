@@ -1,5 +1,10 @@
 # Animated Hero Carousel
 
+[![Build Status](https://github.com/theprantadutta/animated_hero_carousel/actions/workflows/dart.yml/badge.svg)](https://github.com/theprantadutta/animated_hero_carousel/actions/workflows/dart.yml)
+[![Pub Version](https://img.shields.io/pub/v/animated_hero_carousel)](https://pub.dev/packages/animated_hero_carousel)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Style: effective dart](https://img.shields.io/badge/style-effective_dart-40c4ff.svg)](https://github.com/tenhobi/effective_dart)
+
 A highly customizable and animated hero carousel for Flutter, designed to create engaging and visually appealing user interfaces. This package provides smooth hero animations, various indicator types, and pre-built styles to quickly integrate stunning carousels into your application.
 
 ## 📸 Screenshots
